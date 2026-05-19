@@ -1,0 +1,47 @@
+Drug Repurposing Pipeline — Analysis Summary
+====================================================
+Total compounds docked and merged : 41
+Strong hits flagged               : 6
+Vina cutoff                       : <= -7.0 kcal/mol
+DeepPurpose cutoff                : <= 25th percentile
+
+Top 15 by composite rank:
+ composite_rank             drug_name  binding_score  vina_score  composite_score  strong_hit
+              1         dexamethasone          24.78      -7.838        16.097561        True
+              2            naltrexone          27.15      -7.755        18.536585        True
+              3            stanozolol          23.38      -7.638        19.512195        True
+              4             ibrutinib           7.33      -7.384        21.951220        True
+              5 betamethasone-acetate          54.77      -8.159        21.951220       False
+              6           peficitinib          19.41      -7.303        28.780488        True
+              7            nalbuphine          54.74      -7.699        29.756098       False
+              8            mometasone          47.40      -7.559        31.219512       False
+              9           ethisterone          27.72      -7.373        31.219512        True
+             10 dexamethasone-acetate         101.38      -7.885        37.560976       False
+             11           vimseltinib          96.91      -7.882        38.048780       False
+             12        desoximetasone         107.78      -7.910        40.000000       False
+             13            eletriptan          71.07      -7.429        40.975610       False
+             14            ketanserin          85.48      -7.633        42.439024       False
+             14          meprednisone          78.60      -7.556        42.439024       False
+
+Strong hits detail:
+ composite_rank     drug_name  binding_score  vina_score  composite_score  strong_hit
+              1 dexamethasone          24.78      -7.838        16.097561        True
+              2    naltrexone          27.15      -7.755        18.536585        True
+              3    stanozolol          23.38      -7.638        19.512195        True
+              4     ibrutinib           7.33      -7.384        21.951220        True
+              6   peficitinib          19.41      -7.303        28.780488        True
+              9   ethisterone          27.72      -7.373        31.219512        True
+
+Score interpretation:
+  binding_score (DeepPurpose) : predicted Ki [nM], lower = better
+  vina_score                  : ΔG [kcal/mol],     lower = better
+  composite_score             : weighted percentile rank (40% DP + 60% Vina)
+  strong_hit                  : passes both cutoffs simultaneously
+
+Biological note:
+  Corticosteroids (betamethasone, desoximetasone, clocortolone) scoring
+  well is expected — their steroid scaffold mirrors 17β-estradiol and
+  they are known to interact with the ER-alpha ligand-binding domain.
+  These serve as excellent internal validation of the docking setup.
+
+Next steps: run 12_admet_profiling.py -> 13_dashboard.py

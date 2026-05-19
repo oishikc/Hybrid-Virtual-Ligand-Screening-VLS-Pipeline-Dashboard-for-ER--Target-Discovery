@@ -1,0 +1,26 @@
+Phase 4 — ADMET Profiling Summary
+====================================================
+Total compounds profiled     : 41
+Valid RDKit structures       : 41
+Lipinski Ro5 pass           : 41
+Veber oral bioavail pass    : 40
+PAINS-A alerts              : 0
+Alarm-NMR (BRENK) alerts   : 19
+Fully drug-like             : 22
+
+Prime candidates (drug-like AND strong docking hit):
+    drug_name  composite_rank  vina_score  binding_score      QED  LogCmax_est  drug_like
+dexamethasone               1      -7.838          24.78 0.667213     4.473439       True
+   naltrexone               2      -7.755          27.15 0.853622     4.533985       True
+   stanozolol               3      -7.638          23.38 0.752491     4.550740       True
+  peficitinib               6      -7.303          19.41 0.692371     4.553497       True
+
+Descriptor thresholds used:
+  Lipinski: MW<=500, LogP<=5, HBD<=5, HBA<=10
+  Veber:    TPSA<=140 Å², RotBonds<=10
+  Tox:      PAINS-A negative, BRENK/Alarm-NMR negative
+
+Note: Cmax is a rough empirical estimate only.
+  Use PKCSM / pkSmart / SwissADME for clinical-grade prediction.
+
+Next: run 13_dashboard.py to launch Streamlit visualisation.
