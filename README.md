@@ -2,8 +2,6 @@
 
 An interactive, end-to-end computational drug discovery platform that integrates machine learning and physics-based 3D molecular docking to repurpose FDA-approved compounds for hormone receptor-positive breast cancer treatment.
 
-Live Dashboard: *[Insert your hosting link here, e.g., Streamlit Cloud / Hugging Face Spaces]*
-
 ---
 
 ## Project Overview
