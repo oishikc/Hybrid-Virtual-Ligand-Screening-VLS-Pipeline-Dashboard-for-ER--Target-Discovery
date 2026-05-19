@@ -1,6 +1,4 @@
 """
-11_analyze_results.py
-─────────────────────
 Merges DeepPurpose ML scores with AutoDock Vina docking scores,
 computes a composite rank, flags strong hits, and writes the
 final ranked candidate table.
@@ -9,24 +7,20 @@ Outputs
 -------
 data/final_ranked_candidates.csv   – master results table
 data/analysis_summary.txt          – human-readable summary
-
-Run
----
-    python 11_analyze_results.py
 """
 
 import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# ── paths ────────────────────────────────────────────────────────────────────
+# paths
 DATA_DIR   = Path("data")
 TOP50_CSV  = DATA_DIR / "top50_candidates.csv"
 DOCK_CSV   = DATA_DIR / "docking_scores.csv"
 OUT_CSV    = DATA_DIR / "final_ranked_candidates.csv"
 SUMMARY    = DATA_DIR / "analysis_summary.txt"
 
-# ── thresholds for "strong hit" flag ─────────────────────────────────────────
+# thresholds for "strong hit" flag
 # Vina: <= -7.0 kcal/mol  (tighter than -6.0 standard cutoff for drug-sized ligands)
 # DeepPurpose: binding_score percentile <= 25th  (lower = better predicted Ki)
 VINA_CUTOFF       = -7.0   # kcal/mol
@@ -59,11 +53,11 @@ def main():
     print("  Phase 3 → Analysis: Merging DeepPurpose + Vina scores")
     print("=" * 60)
 
-    # ── 1. load data ─────────────────────────────────────────────────────────
+    # 1. load data 
     top50  = load_and_validate(TOP50_CSV,  "DeepPurpose top-50")
     docked = load_and_validate(DOCK_CSV,   "Vina docking scores")
 
-    # ── 2. normalise key columns ──────────────────────────────────────────────
+    # 2. normalise key columns 
     # DeepPurpose CSV expected columns:
     #   rank, drug_name, target, binding_score, pert_iname, smiles
     # Docking CSV expected columns (produced by 10_docking.py):
@@ -94,7 +88,7 @@ def main():
     docked = docked.rename(columns={vina_col: "vina_score"})[["drug_name", "vina_score"]]
 
 
-    # -- 3. deduplicate top50 (keep best binding_score per drug_name) --------
+    # 3. deduplicate top50 (keep best binding_score per drug_name)
     n_before = len(top50)
     top50 = (
         top50
@@ -107,7 +101,7 @@ def main():
         print(f'[INFO] Removed {n_before - n_after} duplicate rows from '
               f'DeepPurpose results (kept best binding_score per compound).')
 
-    # -- 4. merge on drug_name ------------------------------------------------
+    # 4. merge on drug_name
     merged = pd.merge(top50, docked, on='drug_name', how='inner')
     n_merged = len(merged)
     print(f'\n[INFO] {n_merged} compounds successfully docked and merged '
@@ -116,17 +110,17 @@ def main():
         raise RuntimeError("No rows after merge — check that drug_name values "
                            "match between the two CSV files.")
 
-    # ── 4. percentile ranks ───────────────────────────────────────────────────
+    # 4. percentile ranks
     merged["dp_percentile"]   = percentile_rank(merged["binding_score"])
     merged["vina_percentile"] = percentile_rank(merged["vina_score"])
     merged["composite_score"] = composite_score(merged["dp_percentile"],
                                                 merged["vina_percentile"])
 
-    # ── 5. composite rank ─────────────────────────────────────────────────────
+    # 5. composite rank
     merged["composite_rank"] = merged["composite_score"].rank(method="min").astype(int)
     merged = merged.sort_values("composite_rank").reset_index(drop=True)
 
-    # ── 6. strong hit flag ────────────────────────────────────────────────────
+    # 6. strong hit flag 
     dp_threshold = np.percentile(merged["binding_score"], DP_PERCENTILE_CUT)
     merged["strong_hit"] = (
         (merged["vina_score"]    <= VINA_CUTOFF) &
@@ -134,7 +128,7 @@ def main():
     )
     n_strong = merged["strong_hit"].sum()
 
-    # ── 7. reorder columns ────────────────────────────────────────────────────
+    # 7. reorder columns
     col_order = [
         "composite_rank", "drug_name", "pert_iname",
         "binding_score", "dp_percentile",
@@ -148,11 +142,11 @@ def main():
     extras = [c for c in merged.columns if c not in col_order]
     merged = merged[col_order + extras]
 
-    # ── 8. save ───────────────────────────────────────────────────────────────
+  
     merged.to_csv(OUT_CSV, index=False)
     print(f"\n[SAVED] Final ranked candidates → {OUT_CSV}")
 
-    # ── 9. print summary ──────────────────────────────────────────────────────
+
     print("\n" + "=" * 60)
     print("  TOP 15 COMPOSITE-RANKED CANDIDATES")
     print("=" * 60)
@@ -175,7 +169,6 @@ def main():
                                "display.max_colwidth", 28):
             print(strong_df.to_string(index=False))
 
-    # ── 10. write summary text file ───────────────────────────────────────────
     summary_lines = [
         "Drug Repurposing Pipeline — Analysis Summary",
         "=" * 52,
