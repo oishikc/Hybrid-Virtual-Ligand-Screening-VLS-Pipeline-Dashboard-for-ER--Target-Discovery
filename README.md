@@ -67,7 +67,7 @@ Ensure you have Python 3.9+ installed. It is highly recommended to use a Conda e
 ### Installation
 ```bash
 # 1. Clone the repository from your GitHub
-git clone https://github.com/oishikc/er-alpha-vls-dashboard.git
+git clone [https://github.com/oishikc/er-alpha-vls-dashboard.git](https://github.com/oishikc/Hybrid-Virtual-Ligand-Screening-VLS-Pipeline-Dashboard-for-ER--Target-Discovery.git)
 
 # 2. Move into the project directory
 cd er-alpha-vls-dashboard
