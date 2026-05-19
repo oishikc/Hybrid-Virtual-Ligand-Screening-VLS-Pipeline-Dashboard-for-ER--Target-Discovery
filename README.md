@@ -76,4 +76,4 @@ cd er-alpha-vls-dashboard
 pip install -r requirements.txt
 
 # 4. Launch your interactive Streamlit dashboard
-streamlit run app.py
+streamlit run app/13_dashboard.py
