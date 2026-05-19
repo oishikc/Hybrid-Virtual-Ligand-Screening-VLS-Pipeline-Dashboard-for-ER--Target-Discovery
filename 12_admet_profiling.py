@@ -1,6 +1,4 @@
 """
-12_admet_profiling.py
-─────────────────────
 Phase 4 — ADMET (Absorption, Distribution, Metabolism, Excretion, Toxicity)
 profiling of the final ranked candidates using RDKit descriptors.
 
@@ -33,10 +31,6 @@ Output
 ──────
 data/admet_results.csv       – full ADMET table joined to final_ranked_candidates.csv
 data/admet_summary.txt       – human-readable pass/fail summary
-
-Run
-───
-    python 12_admet_profiling.py
 """
 
 import re
@@ -57,19 +51,19 @@ except ImportError:
 
 warnings.filterwarnings("ignore")
 
-# ── paths ─────────────────────────────────────────────────────────────────────
+# paths
 DATA_DIR   = Path("data")
 INPUT_CSV  = DATA_DIR / "final_ranked_candidates.csv"
 OUT_CSV    = DATA_DIR / "admet_results.csv"
 SUMMARY    = DATA_DIR / "admet_summary.txt"
 
-# ── Lipinski thresholds ───────────────────────────────────────────────────────
+# Lipinski thresholds
 LIP_MW_MAX   = 500
 LIP_LOGP_MAX = 5
 LIP_HBD_MAX  = 5
 LIP_HBA_MAX  = 10
 
-# ── Veber oral bioavailability thresholds ─────────────────────────────────────
+# Veber oral bioavailability thresholds
 VEBER_TPSA_MAX     = 140   # Å²
 VEBER_ROTBONDS_MAX = 10
 
@@ -221,7 +215,7 @@ def main():
     result.to_csv(OUT_CSV, index=False)
     print(f"\n[SAVED] ADMET results → {OUT_CSV}")
 
-    # ── print table ───────────────────────────────────────────────────────────
+    
     print("\n" + "=" * 60)
     print("  ADMET SUMMARY — TOP 15 CANDIDATES")
     print("=" * 60)
@@ -279,7 +273,7 @@ def main():
                            "display.max_colwidth", 28):
         print(prime[prime_cols].to_string(index=False))
 
-    # ── write summary ─────────────────────────────────────────────────────────
+    #summary
     lines = [
         "Phase 4 — ADMET Profiling Summary",
         "=" * 52,
