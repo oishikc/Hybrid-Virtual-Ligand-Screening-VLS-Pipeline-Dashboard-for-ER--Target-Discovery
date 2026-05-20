@@ -13,6 +13,7 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
+
 try:
     import streamlit as st
     import plotly.graph_objects as go
@@ -27,7 +28,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-DATA_DIR = Path("data")
+DATA_DIR = Path("results")
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  DESIGN SYSTEM
@@ -611,21 +612,46 @@ def axis_style(**kwargs):
 
 @st.cache_data
 def load_data():
-    for csv in ("admet_results.csv", "final_ranked_candidates.csv"):
-        p = DATA_DIR / csv
-        if p.exists():
-            return pd.read_csv(p), csv
-    st.error("⚠  No results file found. Run scripts 11 then 12 first.")
-    st.stop()
+    cand_path = DATA_DIR / "final_ranked_candidates.csv"
+    admet_path = DATA_DIR / "admet_results.csv"
+    dock_path = DATA_DIR / "docking_scores.csv"
+    sum_path = DATA_DIR / "analysis_summary.txt"
 
-df, source_file = load_data()
+    # Safely load files only if they exist, otherwise create empty DataFrames
+    df_cand = pd.read_csv(cand_path) if cand_path.exists() else pd.DataFrame()
+    df_admet = pd.read_csv(admet_path) if admet_path.exists() else pd.DataFrame()
+    df_dock = pd.read_csv(dock_path) if dock_path.exists() else pd.DataFrame()
 
-for col in ("strong_hit", "lipinski_ok", "veber_ok", "PAINS_alert", "Alarm_NMR", "drug_like"):
-    if col in df.columns:
-        df[col] = df[col].astype(bool)
+    # Read summary text if available
+    if sum_path.exists():
+        with open(sum_path, "r", encoding="utf-8") as f:
+            summary_text = f.read()
     else:
-        df[col] = False
+        summary_text = "Virtual Screening analysis complete."
 
+    # Fallback checking: Core candidate file is absolutely required
+    if df_cand.empty:
+        st.error(f"⚠️ Core file missing: '{cand_path.name}' not found in '{DATA_DIR}' folder.")
+        st.stop()
+
+    return df_cand, df_admet, df_dock, summary_text
+
+
+# Execute the data loading function
+df_cand, df_admet, df_dock, summary_text = load_data()
+
+df = df_cand
+source_file = "final_ranked_candidates.csv"
+
+if not df.empty:
+    if "strong_hits" not in df.columns:
+        if "vina_score" in df.columns:
+            df["strong_hits"] = df["vina_score"] <= -9.0
+        else:
+            df["strong_hits"] = False
+
+    if "drug_like" not in df.columns:
+        df["drug_like"] = True
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  SIDEBAR
@@ -657,7 +683,7 @@ with st.sidebar:
 
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
 
-    if "vina_score" in df.columns:
+    if "vina_score" in df_cand.columns:
         v_min = float(df["vina_score"].min())
         vina_range = st.slider("Vina score (kcal/mol)", v_min, 0.0, (v_min, 0.0), step=0.1)
     else:
