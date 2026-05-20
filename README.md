@@ -66,14 +66,14 @@ Ensure you have Python 3.9+ installed. It is highly recommended to use a Conda e
 
 ### Installation
 ```bash
-# 1. Clone the repository from your GitHub
-git clone [https://github.com/oishikc/er-alpha-vls-dashboard.git](https://github.com/oishikc/Hybrid-Virtual-Ligand-Screening-VLS-Pipeline-Dashboard-for-ER--Target-Discovery.git)
+# 1. Clone the repository from GitHub
+git clone https://github.com/oishikc/er-alpha-vls-dashboard.git
 
 # 2. Move into the project directory
 cd er-alpha-vls-dashboard
 
-# 3. Install all the necessary library dependencies
+# 3. Install all necessary computational dependencies
 pip install -r requirements.txt
 
-# 4. Launch your interactive Streamlit dashboard
-streamlit run app/13_dashboard.py
+# 4. Launch the interactive Streamlit dashboard
+streamlit run app.py
