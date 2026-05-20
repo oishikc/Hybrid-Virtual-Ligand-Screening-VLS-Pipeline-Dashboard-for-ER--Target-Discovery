@@ -1,11 +1,3 @@
-"""
-13_dashboard.py  — ER-alpha Drug Repurposing Dashboard
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Redesigned frontend: publication-quality scientific analytics platform
-Theme: Obsidian · Crimson · Gold · Ivory
-Run:   streamlit run 13_dashboard.py
-"""
-
 import warnings
 import numpy as np
 import pandas as pd
@@ -20,7 +12,6 @@ try:
 except ImportError:
     raise ImportError("pip install streamlit plotly  ->  streamlit run 13_dashboard.py")
 
-# ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Hybrid-VLS | ER-α Drug Repurposing",
     page_icon="🧬",
@@ -30,12 +21,6 @@ st.set_page_config(
 
 DATA_DIR = Path("results")
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  DESIGN SYSTEM
-#  ─────────────────────────────────────────────────────────────────────────────
-#  Color tokens, font tokens, and shared constants live here.
-#  Reference C["token"] everywhere — never hardcode hex values.
-# ══════════════════════════════════════════════════════════════════════════════
 
 C = {
     # Backgrounds — layered depth
@@ -85,13 +70,6 @@ F_HEADING = "DM Serif Display"     # Strong serif for section headings
 F_BODY    = "Jost"                 # Clean geometric sans for body
 F_MONO    = "JetBrains Mono"       # Technical mono for data/labels/stats
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  GLOBAL CSS INJECTION
-#  ─────────────────────────────────────────────────────────────────────────────
-#  Injected once at top. Overrides all default Streamlit styles.
-#  Sections: fonts → base → sidebar → metrics → tabs → buttons →
-#            inputs → headings → dataframe → scrollbar → utilities
-# ══════════════════════════════════════════════════════════════════════════════
 
 st.markdown(f"""
 <style>
@@ -421,13 +399,6 @@ hr {{
 """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  REUSABLE UI COMPONENTS
-#  ─────────────────────────────────────────────────────────────────────────────
-#  All custom HTML components live here as functions.
-#  Import/call these — don't inline raw HTML elsewhere.
-# ══════════════════════════════════════════════════════════════════════════════
-
 def section_label(text: str):
     """Eyebrow label above section headings."""
     st.markdown(
@@ -547,13 +518,6 @@ def pipeline_step(num: int, title: str, detail: str, is_last: bool = False):
         unsafe_allow_html=True,
     )
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  PLOTLY THEME UTILITIES
-#  ─────────────────────────────────────────────────────────────────────────────
-#  All Plotly charts use make_layout() + axis_style() for unified theming.
-# ══════════════════════════════════════════════════════════════════════════════
-
 def make_layout(**kwargs):
     """
     Build a Plotly layout dict with our design system defaults.
@@ -606,9 +570,9 @@ def axis_style(**kwargs):
     return base
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  DATA LOADING  (unchanged from original)
-# ══════════════════════════════════════════════════════════════════════════════
+
+#  DATA LOADING 
+══════════════════════════════════════════════════════════════════════════════
 
 @st.cache_data
 def load_data():
@@ -653,9 +617,6 @@ if not df.empty:
     if "drug_like" not in df.columns:
         df["drug_like"] = True
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
 
 with st.sidebar:
     # Branding block
@@ -725,10 +686,6 @@ with st.sidebar:
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  FILTER APPLICATION  (unchanged logic)
-# ══════════════════════════════════════════════════════════════════════════════
-
 mask = pd.Series([True] * len(df), index=df.index)
 if show_strong:    mask &= df["strong_hit"]
 if show_drug_like: mask &= df["drug_like"]
@@ -740,13 +697,6 @@ if "dp_percentile" in fdf.columns and "vina_percentile" in fdf.columns:
     fdf["composite_score"] = w_dp * fdf["dp_percentile"] + w_vina * fdf["vina_percentile"]
     fdf["composite_rank"]  = fdf["composite_score"].rank(method="min").astype(int)
     fdf = fdf.sort_values("composite_rank")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  HERO SECTION
-#  ─────────────────────────────────────────────────────────────────────────────
-#  Full-width header with project identity, pipeline overview, and about block.
-# ══════════════════════════════════════════════════════════════════════════════
 
 st.markdown(
     f"<div style='padding:2px 0 8px 0'>"
